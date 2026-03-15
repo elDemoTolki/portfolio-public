@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Terminal financiero personal para seguimiento de acciones chilenas" />
+  <title>Portfolio Tracker — Acciones Chilenas</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <div class="brand-icon">₱</div>
+        <div>
+          <div class="brand-title">Portfolio Tracker</div>
+          <div class="brand-sub">Acciones Chilenas · Bolsa de Santiago</div>
+        </div>
+      </div>
+
+      <!-- Portfolio selector -->
+      <div class="portfolio-selector" id="portfolio-selector">
+        <button class="portfolio-selector-btn" id="btn-portfolio-selector" title="Cambiar portafolio">
+          <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"/></svg>
+          <span id="portfolio-current-name">Portafolio</span>
+          <svg width="11" height="11" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+        </button>
+        <div class="portfolio-dropdown hidden" id="portfolio-dropdown">
+          <!-- Populated by app.js -->
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <span id="last-updated"></span>
+
+        <button id="btn-rebuild-history" class="btn btn-ghost" title="Reconstruir historial desde Yahoo Finance">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M2 11a1 1 0 011-1h2a1 1 0 010 2H4.414l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L4.414 10H3a1 1 0 01-1-1zM18 9a1 1 0 01-1 1h-1.586l-3.293-3.293a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L15.586 11H17a1 1 0 011 1z"/>
+          </svg>
+          <span>Historial</span>
+        </button>
+
+        <button id="btn-update-prices" class="btn btn-ghost">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
+          </svg>
+          <span>Actualizar Precios</span>
+        </button>
+
+        <button id="btn-refresh" class="btn btn-ghost">
+          <div class="btn-spinner hidden"></div>
+          <svg class="btn-text" width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M15.312 11.424a5.5 5.5 0 01-9.201 2.466l-.312-.311h2.433a.75.75 0 000-1.5H3.989a.75.75 0 00-.75.75v4.242a.75.75 0 001.5 0v-2.43l.31.31a7 7 0 0011.712-3.138.75.75 0 00-1.449-.39zm1.23-3.723a.75.75 0 00.219-.53V2.929a.75.75 0 00-1.5 0V5.36l-.31-.31A7 7 0 003.239 8.188a.75.75 0 101.448.389A5.5 5.5 0 0113.89 6.11l.311.31h-2.432a.75.75 0 000 1.5h4.243a.75.75 0 00.53-.219z" clip-rule="evenodd"/>
+          </svg>
+          <span class="btn-text">Refrescar</span>
+        </button>
+
+        <button id="btn-add" class="btn btn-primary">
+          <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/>
+          </svg>
+          <span>Nueva Transacción</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── Main ───────────────────────────────────────────────────────────── -->
+  <main class="app-container">
+
+    <!-- Metrics Dashboard -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-title">Resumen del Portafolio</span>
+      </div>
+
+      <div class="metrics-grid">
+        <!-- Card: Capital Invertido -->
+        <div class="metric-card" id="metric-invested">
+          <div class="metric-label">Capital Invertido</div>
+          <div class="metric-value">—</div>
+          <div class="metric-sub">—</div>
+        </div>
+
+        <!-- Card: Valor Actual -->
+        <div class="metric-card" id="metric-value">
+          <div class="metric-label">Valor Actual</div>
+          <div class="metric-value">—</div>
+          <div class="metric-sub">—</div>
+        </div>
+
+        <!-- Card: Ganancia Capital (sin dividendos) -->
+        <div class="metric-card" id="metric-gain">
+          <div class="metric-label">Ganancia Capital</div>
+          <div class="metric-value">—</div>
+          <div class="metric-sub">—</div>
+        </div>
+
+        <!-- Card: Rentabilidad sin dividendos -->
+        <div class="metric-card" id="metric-return-capital">
+          <div class="metric-label">Rentabilidad Capital</div>
+          <div class="metric-value">—</div>
+          <div class="metric-sub">Sin dividendos</div>
+        </div>
+
+        <!-- Card: Rentabilidad total con dividendos -->
+        <div class="metric-card metric-card--highlight" id="metric-return">
+          <div class="metric-label">Rentabilidad Total</div>
+          <div class="metric-value">—</div>
+          <div class="metric-sub">Incluye dividendos</div>
+        </div>
+
+        <!-- Card: Dividendos Recibidos -->
+        <div class="metric-card" id="metric-dividends">
+          <div class="metric-label">Dividendos Recibidos</div>
+          <div class="metric-value">—</div>
+          <div class="metric-sub">—</div>
+        </div>
+
+        <!-- Card: Dividend Yield on Cost -->
+        <div class="metric-card" id="metric-dividend-yield">
+          <div class="metric-label">Yield on Cost</div>
+          <div class="metric-value">—</div>
+          <div class="metric-sub">Dividendos / Capital invertido</div>
+        </div>
+
+        <!-- Card: Beta del Portafolio -->
+        <div class="metric-card" id="metric-beta">
+          <div class="metric-label">Beta del Portafolio</div>
+          <div class="metric-value">—</div>
+          <div class="metric-sub">Volatilidad vs mercado</div>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- Positions Table -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-title">Posiciones</span>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span class="muted" style="font-size:0.72rem">Haz clic en una fila para ver operaciones</span>
+          <button id="btn-export-csv" class="btn btn-ghost">
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+            </svg>
+            Exportar CSV
+          </button>
+        </div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-scroll">
+          <table class="positions-table" aria-label="Tabla de posiciones">
+            <thead>
+              <tr>
+                <th style="text-align:left" data-col="ticker">Ticker</th>
+                <th data-col="categoria">Sector</th>
+                <th data-col="quantity">Cantidad</th>
+                <th data-col="avgPrice">Precio Prom.</th>
+                <th data-col="currentPrice">Precio Actual</th>
+                <th data-col="totalInvested">Invertido</th>
+                <th data-col="currentValue">Valor Actual</th>
+                <th data-col="capitalGain">Ganancia</th>
+                <th data-col="capitalGainPercent">Retorno %</th>
+                <th data-col="daysInPosition">Días</th>
+                <th data-col="irr" data-tooltip="IRR (Tasa Interna de Retorno): rentabilidad anualizada considerando el momento exacto de cada compra. Más preciso que CAGR cuando hay múltiples compras en el tiempo. Requiere ≥30 días.">IRR <span class="th-hint">?</span></th>
+                <th data-col="yieldOnCost" data-tooltip="Yield on Cost: Dividendos recibidos / Capital invertido. Mide la renta pasiva sobre tu precio de compra.">Yield on Cost <span class="th-hint">?</span></th>
+                <th data-col="portfolioWeight">Peso</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="positions-tbody">
+              <!-- Rendered by table.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <hr class="divider" />
+
+    <!-- Charts -->
+    <section class="section">
+      <div class="section-header">
+        <span class="section-title">Análisis Visual</span>
+      </div>
+
+      <div class="charts-grid">
+        <!-- Allocation Pie (Ticker / Broker tabs) -->
+        <div class="chart-card">
+          <div class="chart-title-row">
+            <div class="chart-tabs">
+              <button class="chart-tab active" data-chart-tab="ticker">Por Ticker</button>
+              <button class="chart-tab" data-chart-tab="broker">Por Broker</button>
+            </div>
+          </div>
+          <div class="chart-wrapper" id="chart-allocation-panel">
+            <canvas id="chart-allocation"></canvas>
+          </div>
+          <div class="chart-wrapper hidden" id="chart-broker-panel">
+            <canvas id="chart-broker"></canvas>
+          </div>
+        </div>
+
+        <!-- Evolution Line -->
+        <div class="chart-card">
+          <div class="chart-title">Evolución del Valor</div>
+          <div class="chart-wrapper">
+            <canvas id="chart-evolution"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom row: Gain + Sector -->
+      <div class="charts-row-bottom">
+        <div class="chart-card">
+          <div class="chart-title">Rentabilidad por Ticker</div>
+          <div class="chart-wrapper-tall">
+            <canvas id="chart-gain"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Distribución por Sector</div>
+          <div class="chart-wrapper-tall">
+            <canvas id="chart-sector"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ── Footer ─────────────────────────────────────────────────────────── -->
+  <footer class="app-footer">
+    Portfolio Tracker · Acciones Chilenas · Datos de Yahoo Finance · Uso personal
+  </footer>
+
+  <!-- ── Add / Edit Modal ───────────────────────────────────────────────── -->
+  <div class="modal-overlay" id="operation-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-title">Nueva Compra</h2>
+        <button class="modal-close" id="btn-modal-close" aria-label="Cerrar">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <ul class="form-errors hidden" id="form-errors" role="alert"></ul>
+
+        <form id="operation-form" novalidate autocomplete="off">
+          <div class="form-grid">
+
+            <!-- Tipo (Compra / Venta) -->
+            <div class="form-group full-width">
+              <label class="form-label">Tipo de Operación</label>
+              <div class="tipo-toggle">
+                <button type="button" class="tipo-btn active" data-tipo="COMPRA">Compra</button>
+                <button type="button" class="tipo-btn" data-tipo="VENTA">Venta</button>
+                <input type="hidden" id="field-tipo" value="COMPRA" />
+              </div>
+            </div>
+
+            <!-- Ticker -->
+            <div class="form-group full-width">
+              <label class="form-label" for="field-ticker">Ticker</label>
+              <div class="ticker-input-wrapper">
+                <input
+                  type="text"
+                  id="field-ticker"
+                  class="form-input"
+                  placeholder="ej: SQM-B.SN"
+                  required
+                  autocomplete="off"
+                  maxlength="20"
+                />
+                <div class="ticker-suggestions hidden" id="ticker-suggestions" role="listbox"></div>
+              </div>
+              <span class="form-hint">Los tickers chilenos usan sufijo .SN (ej: COPEC.SN)</span>
+            </div>
+
+            <!-- Date -->
+            <div class="form-group">
+              <label class="form-label" for="field-date">Fecha Compra</label>
+              <input
+                type="date"
+                id="field-date"
+                class="form-input"
+                required
+              />
+            </div>
+
+            <!-- Currency -->
+            <div class="form-group">
+              <label class="form-label" for="field-currency">Moneda</label>
+              <select id="field-currency" class="form-select">
+                <option value="CLP">CLP — Peso Chileno</option>
+                <option value="USD">USD — Dólar</option>
+                <option value="EUR">EUR — Euro</option>
+              </select>
+            </div>
+
+            <!-- Quantity -->
+            <div class="form-group">
+              <label class="form-label" for="field-qty">Cantidad (acciones)</label>
+              <input
+                type="number"
+                id="field-qty"
+                class="form-input"
+                placeholder="ej: 100"
+                min="0.0001"
+                step="any"
+                required
+              />
+            </div>
+
+            <!-- Purchase Price -->
+            <div class="form-group">
+              <label class="form-label" for="field-price">Precio de Compra</label>
+              <input
+                type="number"
+                id="field-price"
+                class="form-input"
+                placeholder="ej: 15000"
+                min="0.0001"
+                step="any"
+                required
+              />
+            </div>
+
+            <!-- Dividends (compra only) -->
+            <div class="form-group" id="group-dividends">
+              <label class="form-label" for="field-dividends">Dividendos Recibidos</label>
+              <input
+                type="number"
+                id="field-dividends"
+                class="form-input"
+                placeholder="0"
+                min="0"
+                step="any"
+                value="0"
+              />
+            </div>
+
+            <!-- Commission -->
+            <div class="form-group">
+              <label class="form-label" for="field-commission">Comisión</label>
+              <input
+                type="number"
+                id="field-commission"
+                class="form-input"
+                placeholder="0"
+                min="0"
+                step="any"
+                value="0"
+              />
+            </div>
+
+            <!-- Corredora -->
+            <div class="form-group">
+              <label class="form-label" for="field-corredora">Corredora <span class="muted">(opcional)</span></label>
+              <input
+                type="text"
+                id="field-corredora"
+                class="form-input"
+                placeholder="Ej: BTG, Fintual, LarrainVial..."
+                maxlength="100"
+              />
+            </div>
+
+            <!-- Nota -->
+            <div class="form-group full-width">
+              <label class="form-label" for="field-nota">Nota <span class="muted">(opcional)</span></label>
+              <input
+                type="text"
+                id="field-nota"
+                class="form-input"
+                placeholder="Motivo de compra, tesis de inversión..."
+                maxlength="500"
+              />
+            </div>
+
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="btn-cancel">Cancelar</button>
+        <button class="btn btn-primary" id="btn-save" form="operation-form" type="submit">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Confirm Modal ──────────────────────────────────────────────────── -->
+  <div class="modal-overlay confirm-modal" id="confirm-modal" role="dialog" aria-modal="true">
+    <div class="modal">
+      <div class="modal-body" style="padding: 24px;">
+        <h3 class="modal-title" id="confirm-title"></h3>
+        <p class="confirm-message" id="confirm-message"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="confirm-no">Cancelar</button>
+        <button class="btn btn-danger" id="confirm-yes" style="background:var(--loss);color:white;border:none;">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── New Portfolio Modal ────────────────────────────────────────────── -->
+  <div class="modal-overlay" id="portfolio-modal" role="dialog" aria-modal="true" aria-labelledby="portfolio-modal-title">
+    <div class="modal" style="max-width:420px">
+      <div class="modal-header">
+        <h2 class="modal-title" id="portfolio-modal-title">Nuevo Portafolio</h2>
+        <button class="modal-close" id="btn-portfolio-modal-close" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="portfolio-form" novalidate autocomplete="off">
+          <div class="form-group full-width" style="margin-bottom:16px">
+            <label class="form-label" for="field-portfolio-name">Nombre</label>
+            <input type="text" id="field-portfolio-name" class="form-input" placeholder="ej: Acciones Growth" maxlength="80" required />
+          </div>
+          <div class="form-group full-width">
+            <label class="form-label" for="field-portfolio-desc">Descripción <span class="muted">(opcional)</span></label>
+            <input type="text" id="field-portfolio-desc" class="form-input" placeholder="ej: Foco en dividendos" maxlength="200" />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="btn-portfolio-cancel">Cancelar</button>
+        <button class="btn btn-primary" id="btn-portfolio-save">Crear Portafolio</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Toast Container ────────────────────────────────────────────────── -->
+  <div id="toast-container" aria-live="polite"></div>
+
+  <!-- ── Scripts ────────────────────────────────────────────────────────── -->
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <!-- Axios CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.6.7/dist/axios.min.js"></script>
+
+  <!-- App modules (order matters) -->
+  <script src="js/api.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/table.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/portfolio.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
