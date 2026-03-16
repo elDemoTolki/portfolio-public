@@ -365,7 +365,7 @@ const Charts = (() => {
   }
 
   function destroyChart(name) {
-    const refs = { allocationChart, evolutionChart, gainChart, sectorChart };
+    const refs = { allocationChart, evolutionChart, gainChart, sectorChart, brokerChart };
     if (refs[name]) refs[name].destroy();
     // Reset the module-level variable
     if (name === 'allocationChart') allocationChart = null;

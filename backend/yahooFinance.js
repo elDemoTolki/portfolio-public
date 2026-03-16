@@ -110,14 +110,47 @@ async function fetchPrices(tickers) {
   const results = {};
   const errors = {};
 
-  // Batch request up to 10 tickers at a time to avoid rate limiting
-  const BATCH_SIZE = 10;
-  for (let i = 0; i < symbols.length; i += BATCH_SIZE) {
-    const batch = symbols.slice(i, i + BATCH_SIZE);
+  // One batch request for all tickers via v7 quote endpoint
+  const failedSymbols = [];
+  try {
+    const url = `${YAHOO_QUOTE}?symbols=${symbols.map(s => encodeURIComponent(s)).join(',')}&fields=regularMarketPrice,regularMarketChange,regularMarketChangePercent,regularMarketVolume,marketCap,longName,shortName,currency,beta`;
+    const response = await axios.get(url, { headers: HEADERS, timeout: REQUEST_TIMEOUT });
+    const quoteResults = response.data?.quoteResponse?.result || [];
+
+    const gotSymbols = new Set();
+    for (const quote of quoteResults) {
+      const price = quote.regularMarketPrice;
+      if (price !== undefined && price !== null) {
+        results[quote.symbol] = {
+          ticker: quote.symbol,
+          precio: price,
+          currency: quote.currency || 'CLP',
+          name: quote.longName || quote.shortName || quote.symbol,
+          change: quote.regularMarketChange || 0,
+          changePercent: quote.regularMarketChangePercent || 0,
+          volume: quote.regularMarketVolume || 0,
+          marketCap: quote.marketCap || 0,
+          beta: quote.beta ?? null,
+          timestamp: new Date().toISOString(),
+        };
+        gotSymbols.add(quote.symbol);
+      }
+    }
+
+    for (const symbol of symbols) {
+      if (!gotSymbols.has(symbol)) failedSymbols.push(symbol);
+    }
+  } catch (err) {
+    console.warn('[Yahoo] Batch quote failed, falling back to individual requests:', err.message);
+    failedSymbols.push(...symbols);
+  }
+
+  // Fallback: individual chart requests only for symbols missing from batch response
+  if (failedSymbols.length > 0) {
     await Promise.allSettled(
-      batch.map(async (symbol) => {
+      failedSymbols.map(async (symbol) => {
         try {
-          const data = await fetchPrice(symbol);
+          const data = await fetchPriceFromChart(symbol);
           results[symbol] = data;
         } catch (err) {
           errors[symbol] = err.message;
@@ -125,11 +158,6 @@ async function fetchPrices(tickers) {
         }
       })
     );
-
-    // Small delay between batches to avoid rate limiting
-    if (i + BATCH_SIZE < symbols.length) {
-      await delay(500);
-    }
   }
 
   return { results, errors };
