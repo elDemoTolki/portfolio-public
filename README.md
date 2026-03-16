@@ -135,4 +135,5 @@ El sistema incluye autocompletado con 42+ tickers preconfigurados con nombre y c
 - **Frontend**: HTML5 · CSS3 · Vanilla JavaScript · Chart.js · Axios
 - **Datos**: Yahoo Finance API (sin clave API requerida)
 
+Demo (Base de datos no persistente, no lo uses como produccion)
 https://porfolio-gqx3.onrender.com/
